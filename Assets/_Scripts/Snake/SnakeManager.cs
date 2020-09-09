@@ -11,7 +11,15 @@ public class SnakeManager : MonoBehaviour
     List<Direction> _listOfMoves = new List<Direction>();
     private int _listOfMovesLength = 0;
     private int _snakeLength = 0;
-    private Direction _currentMoveDirection = Direction.UP;
+    private Direction _currentMoveDirection = Direction.RIGHT;
+
+    public void Awake() {
+        RegisterEvents();
+    }
+
+    public void OnDestroy() {
+        UnRegisterEvents();
+    }
 
     public void SpawnSnake(Vector2 spawnPosition, int startLength) {
         if(_snake != null) {
@@ -73,5 +81,19 @@ public class SnakeManager : MonoBehaviour
                 break;
             }
         }
+    }
+
+    private void UpdateCurrentDirection(Direction direction) {
+        _currentMoveDirection = direction;
+    }
+
+    private void RegisterEvents()
+    {
+        InputManager.GamePadButtonClicked += UpdateCurrentDirection;
+    }
+
+    private void UnRegisterEvents()
+    {
+        InputManager.GamePadButtonClicked -= UpdateCurrentDirection;
     }
 }
