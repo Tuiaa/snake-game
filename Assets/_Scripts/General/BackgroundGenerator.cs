@@ -15,7 +15,7 @@ public class BackgroundGenerator : MonoBehaviour
         
         for (int height = 0; height < givenHeight; height++) {
             for (int width = 0; width < givenWidth; width++) {
-                GameObject tile = Instantiate(_backgroundTile, new Vector2(width, height), Quaternion.identity);
+                GameObject tile = Instantiate(_backgroundTile, new Vector3(width, height, 0.01f), Quaternion.identity);
                 tile.GetComponent<Transform>().SetParent(parent.GetComponent<Transform>());
             }
         }
