@@ -17,10 +17,16 @@ public class GameManager : MonoBehaviour
         }
         utils = new Utils();
         _backgroundGenerator.GetComponent<BackgroundGenerator>().createBackgroundTiles(_gameData.backgroundSizeX, _gameData.backgroundSizeY);
+    
+        InitializeSnakeManager();
+    }
+
+    private void InitializeSnakeManager() {
         _snakeManagerScript = _snakeManager.GetComponent<SnakeManager>();
-        _snakeManagerScript.SpawnSnake(
-            utils.getSnakeSpawnPosition(_gameData.backgroundSizeX, _gameData.backgroundSizeY),
-            _gameData.snakeStartSize);
+        _snakeManagerScript.Initialize(_gameData.backgroundSizeX, _gameData.backgroundSizeY, _gameData.snakeSpeed);
+        
+        _snakeManagerScript.SpawnSnake(utils.getSnakeSpawnPosition(_gameData.backgroundSizeX, _gameData.backgroundSizeY),
+                                                                   _gameData.snakeStartSize);
 
         _snakeManagerScript.StartSnakeMoving();
     }
