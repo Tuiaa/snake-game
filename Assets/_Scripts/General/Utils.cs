@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Direction { UP, DOWN, LEFT, RIGHT };
+
 public class Utils
 {
     public Vector2 getSnakeSpawnPosition(int gameWidth, int gameHeight) {

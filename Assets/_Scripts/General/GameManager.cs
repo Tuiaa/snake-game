@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameDataScriptableObject _gameData;
     [SerializeField] private GameObject _backgroundGenerator;
     [SerializeField] private GameObject _snakeManager;
+    private SnakeManager _snakeManagerScript;
 
     private Utils utils;
     public void Awake() {
@@ -16,9 +17,11 @@ public class GameManager : MonoBehaviour
         }
         utils = new Utils();
         _backgroundGenerator.GetComponent<BackgroundGenerator>().createBackgroundTiles(_gameData.backgroundSizeX, _gameData.backgroundSizeY);
-        
-        _snakeManager.GetComponent<SnakeManager>().SpawnSnake(
+        _snakeManagerScript = _snakeManager.GetComponent<SnakeManager>();
+        _snakeManagerScript.SpawnSnake(
             utils.getSnakeSpawnPosition(_gameData.backgroundSizeX, _gameData.backgroundSizeY),
             _gameData.snakeStartSize);
+
+        _snakeManagerScript.StartSnakeMoving();
     }
 }
