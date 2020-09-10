@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ *      Item
+ *      - Takes care of collisions with snake
+ *      - Triggers an event when item has been eaten
+ */
 public class Item : MonoBehaviour
 {
     public delegate void ItemEatenEventHandler();

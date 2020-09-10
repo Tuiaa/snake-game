@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ *      Item Manager
+ *      - Takes care of item related things
+ */
 public class ItemManager : MonoBehaviour
 {
     [SerializeField] private GameObject _itemPrefab;
-    private PositionStatus[,] _gameBoardStatus;
+    private GameObject _spawnedItem;
+
+    private GameBoardBlockStatus[,] _gameBoardStatus;
     private int _gameBoardWidth = 0;
     private int _gameboardHeight = 0;
-    private GameObject _currentlySpawnedItem;
 
     public void Awake() {
         RegisterEvents();
@@ -21,42 +26,45 @@ public class ItemManager : MonoBehaviour
     public void Initialize(int gameBoardWidth, int gameBoardHeight) {
         _gameBoardWidth = gameBoardWidth;
         _gameboardHeight = gameBoardHeight;
-        InitializeGameBoardStatusArray(gameBoardWidth, gameBoardHeight);
 
+        InitializeGameBoardStatusArray();
         RandomizeNewItem();
     }
 
-    private void InitializeGameBoardStatusArray(int width, int height) {
-        _gameBoardStatus = new PositionStatus[width, height];
+    // Game board status array knows the status of each game board block piece, can be taken or free
+    private void InitializeGameBoardStatusArray() {
+        _gameBoardStatus = new GameBoardBlockStatus[_gameBoardWidth, _gameboardHeight];
 
-        for(int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                _gameBoardStatus[i,j] = PositionStatus.FREE;
+        for(int i = 0; i < _gameBoardWidth; i++) {
+            for (int j = 0; j < _gameboardHeight; j++) {
+                _gameBoardStatus[i,j] = GameBoardBlockStatus.FREE;
             }
         }
     }
 
+    // Randomizes a new location for an item and adds it to the game board status array
     private void RandomizeNewItem() {
         Vector2 itemPosition = new Vector3(Random.Range(0, _gameBoardWidth - 1), Random.Range(0, _gameboardHeight - 1));
 
-        if(_gameBoardStatus[(int)itemPosition.x, (int)itemPosition.y] == PositionStatus.FREE) {
-            _currentlySpawnedItem = Instantiate(_itemPrefab, itemPosition, Quaternion.identity);
-            _gameBoardStatus[(int)itemPosition.x, (int)itemPosition.y] = PositionStatus.TAKEN;
+        if(_gameBoardStatus[(int)itemPosition.x, (int)itemPosition.y] == GameBoardBlockStatus.FREE) {
+            _spawnedItem = Instantiate(_itemPrefab, itemPosition, Quaternion.identity);
+            _gameBoardStatus[(int)itemPosition.x, (int)itemPosition.y] = GameBoardBlockStatus.TAKEN;
         } else {
             RandomizeNewItem();
         }
     }
 
+    /*  EVENTS  */
     private void OnSnakePositionUpdated(Vector2 takenPosition, Vector2 oldPosition) {
-        _gameBoardStatus[(int)takenPosition.x, (int)takenPosition.y] = PositionStatus.TAKEN;
-        _gameBoardStatus[(int)oldPosition.x, (int)oldPosition.y] = PositionStatus.FREE;
+        _gameBoardStatus[(int)takenPosition.x, (int)takenPosition.y] = GameBoardBlockStatus.TAKEN;
+        _gameBoardStatus[(int)oldPosition.x, (int)oldPosition.y] = GameBoardBlockStatus.FREE;
     }
 
     private void OnItemEaten() {
-        Transform _currentItemTransform = _currentlySpawnedItem.GetComponent<Transform>();
-        _gameBoardStatus[(int)_currentItemTransform.position.x, (int)_currentItemTransform.position.y] = PositionStatus.FREE;
+        Transform _currentItemTransform = _spawnedItem.GetComponent<Transform>();
+        _gameBoardStatus[(int)_currentItemTransform.position.x, (int)_currentItemTransform.position.y] = GameBoardBlockStatus.FREE;
 
-        Destroy(_currentlySpawnedItem);
+        Destroy(_spawnedItem);
         RandomizeNewItem();
     }
 
@@ -69,5 +77,6 @@ public class ItemManager : MonoBehaviour
     private void UnRegisterEvents()
     {
         SnakeManager.OnSnakePositionUpdated -= OnSnakePositionUpdated;
+        Item.OnItemEaten -= OnItemEaten;
     }
 }

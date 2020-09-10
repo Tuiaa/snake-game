@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum Direction { UP, DOWN, LEFT, RIGHT };
-public enum PositionStatus { FREE, TAKEN };
+public enum GameBoardBlockStatus { FREE, TAKEN };
     
 /*
  *      Utils

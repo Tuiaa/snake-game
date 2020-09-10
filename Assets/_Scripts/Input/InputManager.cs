@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ *      Input Manager
+ *      - Handles user inputs
+ *      - Sends an event when button has been clicked
+ */
 public class InputManager : MonoBehaviour
 {
     public delegate void GamePadButtonClickEventHandler(Direction direction);
