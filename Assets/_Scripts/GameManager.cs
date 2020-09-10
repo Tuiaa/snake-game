@@ -49,12 +49,6 @@ public class GameManager : MonoBehaviour
     }
 
     private void OnSnakeDied() {
-        Time.timeScale = 0;
-        StartCoroutine(RestartGame());
-    }
-
-    private IEnumerator RestartGame() {
-        yield return new WaitForSeconds(2f);
         SceneManager.LoadScene(GameConstants.GAMESCENE_NAME);
     }
 
