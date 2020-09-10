@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,11 +19,18 @@ public class GameManager : MonoBehaviour
             return;
         }
         utils = new Utils();
+
+         RegisterEvents();
+
         _backgroundGenerator.GetComponent<BackgroundGenerator>().createBackgroundTiles(_gameData.backgroundSizeX, _gameData.backgroundSizeY);
     
         InitializeItemManager();
         InitializeSnakeManager();
 
+    }
+
+    public void OnDestroy() {
+        UnRegisterEvents();
     }
 
     private void InitializeItemManager() {
@@ -38,5 +46,25 @@ public class GameManager : MonoBehaviour
                                                                    _gameData.snakeStartSize);
 
         _snakeManagerScript.StartSnakeMoving();
+    }
+
+    private void OnSnakeDied() {
+        Time.timeScale = 0;
+        StartCoroutine(RestartGame());
+    }
+
+    private IEnumerator RestartGame() {
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene(GameConstants.GAMESCENE_NAME);
+    }
+
+    private void RegisterEvents()
+    {
+        SnakeHead.OnSnakeDied += OnSnakeDied;
+    }
+
+    private void UnRegisterEvents()
+    {
+        SnakeHead.OnSnakeDied -= OnSnakeDied;
     }
 }

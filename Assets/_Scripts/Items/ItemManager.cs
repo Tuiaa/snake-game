@@ -62,7 +62,7 @@ public class ItemManager : MonoBehaviour
         RandomizeNewItem();
     }
 
-        private void RegisterEvents()
+    private void RegisterEvents()
     {
         SnakeManager.OnSnakePositionUpdated += OnSnakePositionUpdated;
         Item.OnItemEaten += OnItemEaten;

@@ -71,7 +71,6 @@ public class SnakeManager : MonoBehaviour
         int moveCount = _listOfMoves.Count;
 
         if (moveCount > _snakeLength) {
-            Debug.Log("Removing one move");
             for(int i = _snakeLength; i < moveCount; i++) {
                 _listOfMoves.RemoveAt(i);
             }
@@ -79,7 +78,6 @@ public class SnakeManager : MonoBehaviour
 
         for (int x = 0; x < _snakeTail.Count; x++) {
                 if(_snakePartAdded && x == _snakeTail.Count - 1) {
-                    _snakeTail[x].position = _lastSnakeTailPositionBeforeAddingNew;
                     _snakePartAdded = false;
                     return;
                 }
@@ -128,32 +126,11 @@ public class SnakeManager : MonoBehaviour
     }
 
     private void OnItemEaten() {
-       // int snakeTailLength = _snakeTail.Count;
-
-        //Direction lastTailPartDirection = _listOfMoves[_listOfMoves.Count - 1];
         _lastSnakeTailPositionBeforeAddingNew = _snakeTail[_snakeTail.Count - 1].position;
-        //Vector2 newTailPartPosition;
-        // switch (lastTailPartDirection) {
-        //     case Direction.UP:
-        //         new Vector2(lastTailPartPosition.x ,lastTailPartPosition.y + 1);
-        //         break;
-        //         case Direction.DOWN:
-        //         new Vector2(lastTailPartPosition.x ,lastTailPartPosition.y - 1);
-        //         break;
-        //         case Direction.LEFT:
-        //         new Vector2(lastTailPartPosition.x ,lastTailPartPosition.y);
-        //         break;
-        //         case Direction.RIGHT:
-        //         new Vector2(lastTailPartPosition.x ,lastTailPartPosition.y);
-        //         break;
-        //         default:
-        //         break;
-        // }
         GameObject tail = Instantiate(_snakeTailPrefab, _lastSnakeTailPositionBeforeAddingNew, Quaternion.identity);
         _snakeLength++;
         _snakeTail.Insert(_snakeTail.Count, tail.GetComponent<Transform>());
         _snakePartAdded = true;
-        Debug.LogWarning("Added another snake part");
     }
 
     private void RegisterEvents()
