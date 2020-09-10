@@ -82,49 +82,51 @@ public class SnakeManager : MonoBehaviour
 
         // Moves each of the snake parts
         for (int x = 0; x < _snakeTail.Count; x++) {
-                if(_snakePartAdded && x == _snakeTail.Count - 1) {
-                    _snakePartAdded = false;
-                    return;
-                }
-                Vector2 snakeTailPosition = new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y);
-                switch (_listOfMoves[x]) {
-                case Direction.UP:
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y + 1), snakeTailPosition);
-                break;
-                case Direction.DOWN:
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y - 1), snakeTailPosition);
-                break;
-                case Direction.LEFT:
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x - 1, _snakeTail[x].position.y), snakeTailPosition);
-                break;
-                case Direction.RIGHT:
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x + 1, _snakeTail[x].position.y), snakeTailPosition);
-                break;
-                default:
-                break;
+            if(_snakePartAdded && x == _snakeTail.Count - 1) {
+                _snakePartAdded = false;
+                return;
             }
+
+            CalculateNewPosition(_listOfMoves[x], _snakeTail[x]);
         }
     }
 
-    private void CalculateNewPosition(Transform snakePart, Vector2 newPosition, Vector2 currentPosition) {
+    private void CalculateNewPosition(Direction direction, Transform snakePart) {
 
-        Vector2 newPos = newPosition;
-        if(newPos.x > _gameBoardWidth - 1)
-        {
-            newPos.x = 0;
+        Vector2 newPosition = new Vector2(0, 0);
+        switch (direction) {
+            case Direction.UP:
+                newPosition = new Vector2(snakePart.position.x, snakePart.position.y + 1);
+            break;
+            case Direction.DOWN:
+                newPosition = new Vector2(snakePart.position.x, snakePart.position.y - 1);
+            break;
+            case Direction.LEFT:
+                newPosition = new Vector2(snakePart.position.x - 1, snakePart.position.y);
+            break;
+            case Direction.RIGHT:
+                newPosition = new Vector2(snakePart.position.x + 1, snakePart.position.y);
+            break;
+            default:
+            break;
         }
-        else if (newPos.x < 0) {
-            newPos.x = _gameBoardWidth - 1;
+        
+        // If snake goes beyond border, it should teleport to the other side
+        if(newPosition.x > _gameBoardWidth - 1) {
+            newPosition.x = 0;
         }
-        else if (newPos.y > _gameBoardHeight - 1) {
-            newPos.y = 0;
+        else if (newPosition.x < 0) {
+            newPosition.x = _gameBoardWidth - 1;
         }
-        else if (newPos.y < 0) {
-            newPos.y = _gameBoardHeight - 1;
+        else if (newPosition.y > _gameBoardHeight - 1) {
+            newPosition.y = 0;
+        }
+        else if (newPosition.y < 0) {
+            newPosition.y = _gameBoardHeight - 1;
         }
 
-        snakePart.position = newPos;
-        OnSnakePositionUpdated?.Invoke(newPos, currentPosition);
+        snakePart.position = newPosition;
+        OnSnakePositionUpdated?.Invoke(newPosition, snakePart.position);
     }
 
     private void OnGamePadButtonClicked(Direction direction) {
