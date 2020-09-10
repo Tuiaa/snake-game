@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
 
          RegisterEvents();
 
-        _backgroundGenerator.GetComponent<BackgroundGenerator>().createBackgroundTiles(_gameData.backgroundSizeX, _gameData.backgroundSizeY);
+        _backgroundGenerator.GetComponent<BackgroundGenerator>().createBackgroundTiles(_gameData.gameBoardWidth, _gameData.gameBoardHeight);
     
         InitializeItemManager();
         InitializeSnakeManager();
@@ -35,14 +35,14 @@ public class GameManager : MonoBehaviour
 
     private void InitializeItemManager() {
         _itemManagerScript = _itemManager.GetComponent<ItemManager>();
-        _itemManagerScript.Initialize(_gameData.backgroundSizeX, _gameData.backgroundSizeY);
+        _itemManagerScript.Initialize(_gameData.gameBoardWidth, _gameData.gameBoardHeight);
     }
 
     private void InitializeSnakeManager() {
         _snakeManagerScript = _snakeManager.GetComponent<SnakeManager>();
-        _snakeManagerScript.Initialize(_gameData.backgroundSizeX, _gameData.backgroundSizeY, _gameData.snakeSpeed);
+        _snakeManagerScript.Initialize(_gameData.gameBoardWidth, _gameData.gameBoardHeight, _gameData.snakeSpeed);
         
-        _snakeManagerScript.SpawnSnake(utils.getSnakeSpawnPosition(_gameData.backgroundSizeX, _gameData.backgroundSizeY),
+        _snakeManagerScript.SpawnSnake(utils.getMiddlePositionFromGameBoard(_gameData.gameBoardWidth, _gameData.gameBoardHeight),
                                                                    _gameData.snakeStartSize);
 
         _snakeManagerScript.StartSnakeMoving();

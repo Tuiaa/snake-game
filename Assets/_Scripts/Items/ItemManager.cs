@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum PositionStatus { FREE, TAKEN };
-
 public class ItemManager : MonoBehaviour
 {
     [SerializeField] private GameObject _itemPrefab;
