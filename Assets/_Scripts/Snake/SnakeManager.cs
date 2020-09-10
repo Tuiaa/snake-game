@@ -129,13 +129,14 @@ public class SnakeManager : MonoBehaviour
         OnSnakePositionUpdated?.Invoke(newPosition, snakePart.position);
     }
 
+    /*  EVENTS  */
     private void OnGamePadButtonClicked(Direction direction) {
         _currentMoveDirection = direction;
     }
 
+    // Grow snake when it has eaten an item
     private void OnItemEaten() {
         GameObject tail = Instantiate(_snakeTailPrefab, _snakeTail[_snakeTail.Count - 1].position, Quaternion.identity);
-       // _snakeLength++;
         _snakeTail.Insert(_snakeTail.Count, tail.GetComponent<Transform>());
         _snakePartAdded = true;
     }
@@ -149,5 +150,6 @@ public class SnakeManager : MonoBehaviour
     private void UnRegisterEvents()
     {
         InputManager.OnGamePadButtonClicked -= OnGamePadButtonClicked;
+        Item.OnItemEaten -= OnItemEaten;
     }
 }
