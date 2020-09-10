@@ -5,21 +5,21 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     public delegate void GamePadButtonClickEventHandler(Direction direction);
-    public static event GamePadButtonClickEventHandler GamePadButtonClicked;
+    public static event GamePadButtonClickEventHandler OnGamePadButtonClicked;
 
     public void UpButtonClicked() {
-        GamePadButtonClicked?.Invoke(Direction.UP);
+        OnGamePadButtonClicked?.Invoke(Direction.UP);
     }
 
     public void DownButtonClicked() {
-        GamePadButtonClicked?.Invoke(Direction.DOWN);
+        OnGamePadButtonClicked?.Invoke(Direction.DOWN);
     }
 
     public void LeftButtonClicked() {
-        GamePadButtonClicked?.Invoke(Direction.LEFT);
+        OnGamePadButtonClicked?.Invoke(Direction.LEFT);
     }
 
     public void RightButtonClicked() {
-        GamePadButtonClicked?.Invoke(Direction.RIGHT);
+        OnGamePadButtonClicked?.Invoke(Direction.RIGHT);
     }
 }

@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SnakeManager : MonoBehaviour
 {
+    public delegate void SnakePositionUpdatedEventHandler(Vector2 newPosition, Vector2 oldPosition);
+    public static event SnakePositionUpdatedEventHandler OnSnakePositionUpdated;
+
     [SerializeField] private GameObject _snakePrefab;
     [SerializeField] private Transform _snake;
 
@@ -73,20 +76,16 @@ public class SnakeManager : MonoBehaviour
         for (int x = 0; x < _snakeTail.Count; x++) {
                 switch (_listOfMoves[x]) {
                 case Direction.UP:
-                    //_snakeTail[x].position = new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y + 1);
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y + 1));
+                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y + 1), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
                 break;
                 case Direction.DOWN:
-                    //_snakeTail[x].position = new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y - 1);  
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y - 1));
+                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y - 1), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
                 break;
                 case Direction.LEFT:
-                    // _snakeTail[x].position = new Vector2(_snakeTail[x].position.x - 1, _snakeTail[x].position.y);
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x - 1, _snakeTail[x].position.y));
+                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x - 1, _snakeTail[x].position.y), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
                 break;
                 case Direction.RIGHT:
-                    //_snakeTail[x].position = new Vector2(_snakeTail[x].position.x + 1, _snakeTail[x].position.y);
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x + 1, _snakeTail[x].position.y));
+                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x + 1, _snakeTail[x].position.y), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
                 break;
                 default:
                 break;
@@ -94,24 +93,25 @@ public class SnakeManager : MonoBehaviour
         }
     }
 
-    private void CalculateNewPosition(Transform snakePart, Vector2 newPosition) {
+    private void CalculateNewPosition(Transform snakePart, Vector2 newPosition, Vector2 currentPosition) {
 
-        Vector2 tempPos = newPosition;
-        if(tempPos.x > _gameBoardWidth - 1)
+        Vector2 newPos = newPosition;
+        if(newPos.x > _gameBoardWidth - 1)
         {
-            tempPos.x = 0;
+            newPos.x = 0;
         }
-        else if (tempPos.x < 0) {
-            tempPos.x = _gameBoardWidth - 1;
+        else if (newPos.x < 0) {
+            newPos.x = _gameBoardWidth - 1;
         }
-        else if (tempPos.y > _gameBoardHeight - 1) {
-            tempPos.y = 0;
+        else if (newPos.y > _gameBoardHeight - 1) {
+            newPos.y = 0;
         }
-        else if (tempPos.y < 0) {
-            tempPos.y = _gameBoardHeight - 1;
+        else if (newPos.y < 0) {
+            newPos.y = _gameBoardHeight - 1;
         }
 
-        snakePart.position = tempPos;
+        snakePart.position = newPos;
+        OnSnakePositionUpdated?.Invoke(newPos, currentPosition);
     }
 
     private void UpdateCurrentDirection(Direction direction) {
@@ -120,11 +120,11 @@ public class SnakeManager : MonoBehaviour
 
     private void RegisterEvents()
     {
-        InputManager.GamePadButtonClicked += UpdateCurrentDirection;
+        InputManager.OnGamePadButtonClicked += UpdateCurrentDirection;
     }
 
     private void UnRegisterEvents()
     {
-        InputManager.GamePadButtonClicked -= UpdateCurrentDirection;
+        InputManager.OnGamePadButtonClicked -= UpdateCurrentDirection;
     }
 }
