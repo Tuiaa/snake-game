@@ -7,11 +7,13 @@ public class SnakeManager : MonoBehaviour
     public delegate void SnakePositionUpdatedEventHandler(Vector2 newPosition, Vector2 oldPosition);
     public static event SnakePositionUpdatedEventHandler OnSnakePositionUpdated;
 
-    [SerializeField] private GameObject _snakePrefab;
+    [SerializeField] private GameObject _snakeTailPrefab;
     [SerializeField] private Transform _snake;
 
     List<Transform> _snakeTail;
     List<Direction> _listOfMoves = new List<Direction>();
+    Vector2 _lastSnakeTailPositionBeforeAddingNew;
+    bool _snakePartAdded = false;
     private int _listOfMovesLength = 0;
     private int _snakeLength = 0;
     private float _snakeSpeed = 0;
@@ -42,7 +44,7 @@ public class SnakeManager : MonoBehaviour
             _snakeTail.Add(_snake);
 
             for (int i = 1; i < startLength; i++) {
-                GameObject tail = Instantiate(_snakePrefab, new Vector2(spawnPosition.x - i, spawnPosition.y), Quaternion.identity);
+                GameObject tail = Instantiate(_snakeTailPrefab, new Vector2(spawnPosition.x - i, spawnPosition.y), Quaternion.identity);
                 _snakeTail.Add(tail.GetComponent<Transform>());
             }
 
@@ -67,13 +69,20 @@ public class SnakeManager : MonoBehaviour
         _listOfMoves.Insert(0, _currentMoveDirection);
 
         int moveCount = _listOfMoves.Count;
+
         if (moveCount > _snakeLength) {
+            Debug.Log("Removing one move");
             for(int i = _snakeLength; i < moveCount; i++) {
                 _listOfMoves.RemoveAt(i);
             }
         }
 
         for (int x = 0; x < _snakeTail.Count; x++) {
+                if(_snakePartAdded && x == _snakeTail.Count - 1) {
+                    _snakeTail[x].position = _lastSnakeTailPositionBeforeAddingNew;
+                    _snakePartAdded = false;
+                    return;
+                }
                 switch (_listOfMoves[x]) {
                 case Direction.UP:
                     CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y + 1), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
@@ -114,17 +123,47 @@ public class SnakeManager : MonoBehaviour
         OnSnakePositionUpdated?.Invoke(newPos, currentPosition);
     }
 
-    private void UpdateCurrentDirection(Direction direction) {
+    private void OnGamePadButtonClicked(Direction direction) {
         _currentMoveDirection = direction;
+    }
+
+    private void OnItemEaten() {
+       // int snakeTailLength = _snakeTail.Count;
+
+        //Direction lastTailPartDirection = _listOfMoves[_listOfMoves.Count - 1];
+        _lastSnakeTailPositionBeforeAddingNew = _snakeTail[_snakeTail.Count - 1].position;
+        //Vector2 newTailPartPosition;
+        // switch (lastTailPartDirection) {
+        //     case Direction.UP:
+        //         new Vector2(lastTailPartPosition.x ,lastTailPartPosition.y + 1);
+        //         break;
+        //         case Direction.DOWN:
+        //         new Vector2(lastTailPartPosition.x ,lastTailPartPosition.y - 1);
+        //         break;
+        //         case Direction.LEFT:
+        //         new Vector2(lastTailPartPosition.x ,lastTailPartPosition.y);
+        //         break;
+        //         case Direction.RIGHT:
+        //         new Vector2(lastTailPartPosition.x ,lastTailPartPosition.y);
+        //         break;
+        //         default:
+        //         break;
+        // }
+        GameObject tail = Instantiate(_snakeTailPrefab, _lastSnakeTailPositionBeforeAddingNew, Quaternion.identity);
+        _snakeLength++;
+        _snakeTail.Insert(_snakeTail.Count, tail.GetComponent<Transform>());
+        _snakePartAdded = true;
+        Debug.LogWarning("Added another snake part");
     }
 
     private void RegisterEvents()
     {
-        InputManager.OnGamePadButtonClicked += UpdateCurrentDirection;
+        InputManager.OnGamePadButtonClicked += OnGamePadButtonClicked;
+        Item.OnItemEaten += OnItemEaten;
     }
 
     private void UnRegisterEvents()
     {
-        InputManager.OnGamePadButtonClicked -= UpdateCurrentDirection;
+        InputManager.OnGamePadButtonClicked -= OnGamePadButtonClicked;
     }
 }

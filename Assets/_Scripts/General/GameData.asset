@@ -15,4 +15,4 @@ MonoBehaviour:
   backgroundSizeX: 15
   backgroundSizeY: 10
   snakeStartSize: 4
-  snakeSpeed: 0.5
+  snakeSpeed: 1

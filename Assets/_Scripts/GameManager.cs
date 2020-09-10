@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     
         InitializeItemManager();
         InitializeSnakeManager();
+
     }
 
     private void InitializeItemManager() {
