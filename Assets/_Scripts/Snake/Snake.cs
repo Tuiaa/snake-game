@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SnakeHead : MonoBehaviour
+/*
+ *      Snake
+ *      - Takes care of collision with its own tail
+ *      - Triggers a game ending event
+ */
+public class Snake : MonoBehaviour
 {
     public delegate void SnakeDiedEventHandler();
     public static event SnakeDiedEventHandler OnSnakeDied;

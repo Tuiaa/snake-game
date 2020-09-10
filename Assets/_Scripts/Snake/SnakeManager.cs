@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ *      Snake Manager
+ *      - Takes care of snake related things
+ */
 public class SnakeManager : MonoBehaviour
 {
     public delegate void SnakePositionUpdatedEventHandler(Vector2 newPosition, Vector2 oldPosition);
@@ -11,15 +15,14 @@ public class SnakeManager : MonoBehaviour
     [SerializeField] private Transform _snake;
 
     List<Transform> _snakeTail;
-    List<Direction> _listOfMoves = new List<Direction>();
-    Vector2 _lastSnakeTailPositionBeforeAddingNew;
-    bool _snakePartAdded = false;
+    List<Direction> _listOfMoves;
     private int _listOfMovesLength = 0;
-    private int _snakeLength = 0;
+    private Direction _currentMoveDirection = Direction.RIGHT;
+
+    bool _snakePartAdded = false;
     private float _snakeSpeed = 0;
     private int _gameBoardWidth = 0;
     private int _gameBoardHeight = 0;
-    private Direction _currentMoveDirection = Direction.RIGHT;
 
     public void Awake() {
         RegisterEvents();
@@ -32,10 +35,10 @@ public class SnakeManager : MonoBehaviour
     public void Initialize(int width, int height, float snakeSpeed) {
         _gameBoardWidth = width;
         _gameBoardHeight = height;
-
         _snakeSpeed = snakeSpeed;
     }
 
+    // Spawns the snake and its tail and adds them into a list
     public void SpawnSnake(Vector2 spawnPosition, int startLength) {
         if(_snake != null) {
             _snake.position = spawnPosition;
@@ -49,9 +52,15 @@ public class SnakeManager : MonoBehaviour
             }
 
             _listOfMovesLength = startLength;
-            _snakeLength = startLength;
-
             InitializeMoveList();
+        }
+    }
+
+    // Keeps track of the moves snake has done
+    private void InitializeMoveList() {
+        _listOfMoves = new List<Direction>();
+        for (int i = 0; i < _listOfMovesLength; i++) {
+            _listOfMoves.Add(Direction.RIGHT);
         }
     }
 
@@ -59,40 +68,37 @@ public class SnakeManager : MonoBehaviour
         InvokeRepeating("MoveSnake", _snakeSpeed, _snakeSpeed);
     }
 
-    private void InitializeMoveList() {
-        for (int i = 0; i < _listOfMovesLength; i++) {
-            _listOfMoves.Add(Direction.RIGHT);
-        }
-    }
-
+    // Moves each snake part one move behind each other
     private void MoveSnake() {
+        // Adds a move to the list
         _listOfMoves.Insert(0, _currentMoveDirection);
 
-        int moveCount = _listOfMoves.Count;
-
-        if (moveCount > _snakeLength) {
-            for(int i = _snakeLength; i < moveCount; i++) {
+        // Checks if there's more moves than there are snake parts
+        if (_listOfMoves.Count > _snakeTail.Count) {
+            for(int i = _snakeTail.Count; i < _listOfMoves.Count; i++) {
                 _listOfMoves.RemoveAt(i);
             }
         }
 
+        // Moves each of the snake parts
         for (int x = 0; x < _snakeTail.Count; x++) {
                 if(_snakePartAdded && x == _snakeTail.Count - 1) {
                     _snakePartAdded = false;
                     return;
                 }
+                Vector2 snakeTailPosition = new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y);
                 switch (_listOfMoves[x]) {
                 case Direction.UP:
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y + 1), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
+                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y + 1), snakeTailPosition);
                 break;
                 case Direction.DOWN:
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y - 1), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
+                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y - 1), snakeTailPosition);
                 break;
                 case Direction.LEFT:
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x - 1, _snakeTail[x].position.y), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
+                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x - 1, _snakeTail[x].position.y), snakeTailPosition);
                 break;
                 case Direction.RIGHT:
-                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x + 1, _snakeTail[x].position.y), new Vector2(_snakeTail[x].position.x, _snakeTail[x].position.y));
+                    CalculateNewPosition(_snakeTail[x], new Vector2(_snakeTail[x].position.x + 1, _snakeTail[x].position.y), snakeTailPosition);
                 break;
                 default:
                 break;
@@ -126,9 +132,8 @@ public class SnakeManager : MonoBehaviour
     }
 
     private void OnItemEaten() {
-        _lastSnakeTailPositionBeforeAddingNew = _snakeTail[_snakeTail.Count - 1].position;
-        GameObject tail = Instantiate(_snakeTailPrefab, _lastSnakeTailPositionBeforeAddingNew, Quaternion.identity);
-        _snakeLength++;
+        GameObject tail = Instantiate(_snakeTailPrefab, _snakeTail[_snakeTail.Count - 1].position, Quaternion.identity);
+       // _snakeLength++;
         _snakeTail.Insert(_snakeTail.Count, tail.GetComponent<Transform>());
         _snakePartAdded = true;
     }

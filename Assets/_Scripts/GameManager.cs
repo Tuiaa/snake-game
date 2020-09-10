@@ -54,11 +54,11 @@ public class GameManager : MonoBehaviour
 
     private void RegisterEvents()
     {
-        SnakeHead.OnSnakeDied += OnSnakeDied;
+        Snake.OnSnakeDied += OnSnakeDied;
     }
 
     private void UnRegisterEvents()
     {
-        SnakeHead.OnSnakeDied -= OnSnakeDied;
+        Snake.OnSnakeDied -= OnSnakeDied;
     }
 }
