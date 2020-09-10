@@ -14,7 +14,7 @@ public class SnakeManager : MonoBehaviour
     [SerializeField] private GameObject _snakeTailPrefab;
     [SerializeField] private Transform _snake;
 
-    List<Transform> _snakeTail;
+    List<Transform> _snakeTailList;
     List<Direction> _listOfMoves;
     private int _listOfMovesLength = 0;
     private Direction _currentMoveDirection = Direction.RIGHT;
@@ -40,20 +40,22 @@ public class SnakeManager : MonoBehaviour
 
     // Spawns the snake and its tail and adds them into a list
     public void SpawnSnake(Vector2 spawnPosition, int startLength) {
-        if(_snake != null) {
-            _snake.position = spawnPosition;
-
-            _snakeTail = new List<Transform>();
-            _snakeTail.Add(_snake);
-
-            for (int i = 1; i < startLength; i++) {
-                GameObject tail = Instantiate(_snakeTailPrefab, new Vector2(spawnPosition.x - i, spawnPosition.y), Quaternion.identity);
-                _snakeTail.Add(tail.GetComponent<Transform>());
-            }
-
-            _listOfMovesLength = startLength;
-            InitializeMoveList();
+        if(_snake == null) {
+            Debug.LogWarning("SnakeManager: Missing Snake reference!");
+            return;
         }
+
+        _snake.position = spawnPosition;
+        _snakeTailList = new List<Transform>();
+        _snakeTailList.Add(_snake);
+
+        for (int i = 1; i < startLength; i++) {
+            GameObject tail = Instantiate(_snakeTailPrefab, new Vector2(spawnPosition.x - i, spawnPosition.y), Quaternion.identity);
+            _snakeTailList.Add(tail.GetComponent<Transform>());
+        }
+
+        _listOfMovesLength = startLength;
+        InitializeMoveList();
     }
 
     // Keeps track of the moves snake has done
@@ -74,20 +76,20 @@ public class SnakeManager : MonoBehaviour
         _listOfMoves.Insert(0, _currentMoveDirection);
 
         // Checks if there's more moves than there are snake parts
-        if (_listOfMoves.Count > _snakeTail.Count) {
-            for(int i = _snakeTail.Count; i < _listOfMoves.Count; i++) {
+        if (_listOfMoves.Count > _snakeTailList.Count) {
+            for(int i = _snakeTailList.Count; i < _listOfMoves.Count; i++) {
                 _listOfMoves.RemoveAt(i);
             }
         }
 
         // Moves each of the snake parts
-        for (int x = 0; x < _snakeTail.Count; x++) {
-            if(_snakePartAdded && x == _snakeTail.Count - 1) {
+        for (int x = 0; x < _snakeTailList.Count; x++) {
+            if(_snakePartAdded && x == _snakeTailList.Count - 1) {
                 _snakePartAdded = false;
                 return;
             }
 
-            CalculateNewPosition(_listOfMoves[x], _snakeTail[x]);
+            CalculateNewPosition(_listOfMoves[x], _snakeTailList[x]);
         }
     }
 
@@ -136,8 +138,8 @@ public class SnakeManager : MonoBehaviour
 
     // Grow snake when it has eaten an item
     private void OnItemEaten() {
-        GameObject tail = Instantiate(_snakeTailPrefab, _snakeTail[_snakeTail.Count - 1].position, Quaternion.identity);
-        _snakeTail.Insert(_snakeTail.Count, tail.GetComponent<Transform>());
+        GameObject tail = Instantiate(_snakeTailPrefab, _snakeTailList[_snakeTailList.Count - 1].position, Quaternion.identity);
+        _snakeTailList.Insert(_snakeTailList.Count, tail.GetComponent<Transform>());
         _snakePartAdded = true;
     }
 

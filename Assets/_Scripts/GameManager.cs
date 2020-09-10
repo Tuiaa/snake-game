@@ -3,16 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/*
+ *      Game Manager
+ *      - Takes care of the game logic
+ */
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameDataScriptableObject _gameData;
     [SerializeField] private GameObject _backgroundGenerator;
     [SerializeField] private GameObject _snakeManager;
     [SerializeField] private GameObject _itemManager;
+
     private SnakeManager _snakeManagerScript;
     private ItemManager _itemManagerScript;
 
     private Utils utils;
+
     public void Awake() {
         if(_gameData == null || _backgroundGenerator == null || _snakeManager == null || _itemManager == null){
             Debug.LogWarning("GameManager: Missing references!");
@@ -20,10 +26,9 @@ public class GameManager : MonoBehaviour
         }
         utils = new Utils();
 
-         RegisterEvents();
+        RegisterEvents();
 
-        _backgroundGenerator.GetComponent<BackgroundGenerator>().createBackgroundTiles(_gameData.gameBoardWidth, _gameData.gameBoardHeight);
-    
+        InitializeGameBackground();
         InitializeItemManager();
         InitializeSnakeManager();
 
@@ -31,6 +36,10 @@ public class GameManager : MonoBehaviour
 
     public void OnDestroy() {
         UnRegisterEvents();
+    }
+
+    private void InitializeGameBackground() {
+        _backgroundGenerator.GetComponent<BackgroundGenerator>().createBackgroundTiles(_gameData.gameBoardWidth, _gameData.gameBoardHeight);
     }
 
     private void InitializeItemManager() {
@@ -41,13 +50,11 @@ public class GameManager : MonoBehaviour
     private void InitializeSnakeManager() {
         _snakeManagerScript = _snakeManager.GetComponent<SnakeManager>();
         _snakeManagerScript.Initialize(_gameData.gameBoardWidth, _gameData.gameBoardHeight, _gameData.snakeSpeed);
-        
-        _snakeManagerScript.SpawnSnake(utils.getMiddlePositionFromGameBoard(_gameData.gameBoardWidth, _gameData.gameBoardHeight),
-                                                                   _gameData.snakeStartSize);
-
+        _snakeManagerScript.SpawnSnake(utils.getMiddlePositionFromGameBoard(_gameData.gameBoardWidth, _gameData.gameBoardHeight), _gameData.snakeStartSize);
         _snakeManagerScript.StartSnakeMoving();
     }
 
+    /*  EVENTS  */
     private void OnSnakeDied() {
         SceneManager.LoadScene(GameConstants.GAMESCENE_NAME);
     }

@@ -687,7 +687,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1993907175193016421, guid: 437db5f81c8466746a7200c80bac2e66, type: 3}
       propertyPath: m_Name
-      value: SnakeHead
+      value: Snake
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 437db5f81c8466746a7200c80bac2e66, type: 3}
